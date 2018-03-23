@@ -62,7 +62,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="A SHOT on Goal.cpp" />
+    <ClCompile Include="A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp" />
     <ClCompile Include="gccpch.h" />
   </ItemGroup>
   <ItemGroup>
