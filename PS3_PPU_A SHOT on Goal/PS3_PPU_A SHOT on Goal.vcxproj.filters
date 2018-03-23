@@ -14,7 +14,7 @@
     <ClCompile Include="gccpch.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="A SHOT on Goal.cpp">
+    <ClCompile Include="A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

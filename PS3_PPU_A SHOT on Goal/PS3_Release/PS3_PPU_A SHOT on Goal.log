@@ -1,17 +1,17 @@
-﻿Build started 23/03/2018 13:38:33.
+﻿Build started 23/03/2018 16:08:02.
      1>Project "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\PS3_PPU_A SHOT on Goal.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         gccpch.h
-         ppu-lv2-gcc.exe -x c++-header -o "gccpch.h.gch\PS3_PPU_A SHOT on Goal_Release.h.gch" -c -iquote. -fpch-deps -MD -MV -IC:/usr/local/cell\target\ppu\include -IC:/usr/local/cell\target\common\include -I"C:/usr/local/cell\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\include" -DNDEBUG -D__PS3__ -D__GCC__ -Wall -O2 -ffast-math -fno-exceptions -fno-rtti "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\gccpch.h"
-         A SHOT on Goal.cpp
-         ppu-lv2-gcc.exe -o "PS3_Release\A SHOT on Goal.o" -c -iquote. -fpch-deps -MD -MV -IC:/usr/local/cell\target\ppu\include -IC:/usr/local/cell\target\common\include -I"C:/usr/local/cell\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\include" -DNDEBUG -D__PS3__ -D__GCC__ -Wall -O2 -ffast-math -fno-exceptions -fno-rtti "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A SHOT on Goal.cpp"
-         C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A SHOT on Goal.cpp: In function 'long long int get_time_in_ticks()':
-     1>C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A SHOT on Goal.cpp(498): warning : control reaches end of non-void function
+         A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp
+         ppu-lv2-gcc.exe -o "PS3_Release\A 12m SHOT on Goal - USE FOR ASSIGNMENT.o" -c -iquote. -fpch-deps -MD -MV -IC:/usr/local/cell\target\ppu\include -IC:/usr/local/cell\target\common\include -I"C:/usr/local/cell\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\include" -DNDEBUG -D__PS3__ -D__GCC__ -Wall -O2 -ffast-math -fno-exceptions -fno-rtti "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp"
+         C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp: In function 'void generateFlightPath(float, float)':
+     1>C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp(428): warning : converting to 'int' from 'float'
+         C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp: In function 'long long int get_time_in_ticks()':
+     1>C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\A 12m SHOT on Goal - USE FOR ASSIGNMENT.cpp(662): warning : control reaches end of non-void function
        Link:
-         C:\usr\local\cell\host-win32\ppu\bin\ppu-lv2-gcc.exe -o "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_Release\PS3_PPU_A SHOT on Goal.self" -Wl,-oformat=fself -fno-exceptions -fno-rtti -Wl,--start-group "PS3_Release\A SHOT on Goal.o" "C:\Program Files (x86)\SN Systems\PS3\ppu\lib\sn\libsn.a" C:/usr/local/cell\target\ppu\lib\libm.a C:/usr/local/cell\target\ppu\lib\libio_stub.a -Wl,--end-group
+         C:\usr\local\cell\host-win32\ppu\bin\ppu-lv2-gcc.exe -o "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_Release\PS3_PPU_A SHOT on Goal.self" -Wl,-oformat=fself -fno-exceptions -fno-rtti -Wl,--start-group "PS3_Release\A 12m SHOT on Goal - USE FOR ASSIGNMENT.o" "C:\Program Files (x86)\SN Systems\PS3\ppu\lib\sn\libsn.a" C:/usr/local/cell\target\ppu\lib\libm.a C:/usr/local/cell\target\ppu\lib\libio_stub.a -Wl,--end-group
          PS3_PPU_A SHOT on Goal.vcxproj -> C:\Users\b6027599\Desktop\SHOT_PS3\PS3_Release\PS3_PPU_A SHOT on Goal.self
      1>Done Building Project "C:\Users\b6027599\Desktop\SHOT_PS3\PS3_PPU_A SHOT on Goal\PS3_PPU_A SHOT on Goal.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:03.88
+Time Elapsed 00:00:03.27

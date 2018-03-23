@@ -104,16 +104,188 @@ const float xScale = 1.0F / deltaD;	// horizontal scaling factor
 
 const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
 // +2.0 so that ball appears beyond the goal at maxDistance
+float flightPath[104 + 1][2] __attribute__((aligned(64))) =
+{
+	{ 0.00f, -1.0f },
+	{ 0.50f, -1.0f },
+	{ 1.00f, -1.0f },
+	{ 1.50f, -1.0f },
+	{ 2.00f, -1.0f },
+	{ 2.50f, -1.0f },
+	{ 3.00f, -1.0f },
+	{ 3.50f, -1.0f },
+	{ 4.00f, -1.0f },
+	{ 4.50f, -1.0f },
+	{ 5.00f, -1.0f },
+	{ 5.50f, -1.0f },
+	{ 6.00f, -1.0f },
+	{ 6.50f, -1.0f },
+	{ 7.00f, -1.0f },
+	{ 7.50f, -1.0f },
+	{ 8.00f, -1.0f },
+	{ 8.50f, -1.0f },
+	{ 9.00f, -1.0f },
+	{ 9.50f, -1.0f },
+	{ 10.00f, -1.0f },
+	{ 10.50f, -1.0f },
+	{ 11.00f, -1.0f },
+	{ 11.50f, -1.0f },
+	{ 12.00f, -1.0f },
+	{ 12.50f, -1.0f },
+	{ 13.00f, -1.0f },
+	{ 13.50f, -1.0f },
+	{ 14.00f, -1.0f },
+	{ 14.50f, -1.0f },
+	{ 15.00f, -1.0f },
+	{ 15.50f, -1.0f },
+	{ 16.00f, -1.0f },
+	{ 16.50f, -1.0f },
+	{ 17.00f, -1.0f },
+	{ 17.50f, -1.0f },
+	{ 18.00f, -1.0f },
+	{ 18.50f, -1.0f },
+	{ 19.00f, -1.0f },
+	{ 19.50f, -1.0f },
+	{ 20.00f, -1.0f },
+	{ 20.50f, -1.0f },
+	{ 21.00f, -1.0f },
+	{ 21.50f, -1.0f },
+	{ 22.00f, -1.0f },
+	{ 22.50f, -1.0f },
+	{ 23.00f, -1.0f },
+	{ 23.50f, -1.0f },
+	{ 24.00f, -1.0f },
+	{ 24.50f, -1.0f },
+	{ 25.00f, -1.0f },
+	{ 25.50f, -1.0f },
+	{ 26.00f, -1.0f },
+	{ 26.50f, -1.0f },
+	{ 27.00f, -1.0f },
+	{ 27.50f, -1.0f },
+	{ 28.00f, -1.0f },
+	{ 28.50f, -1.0f },
+	{ 29.00f, -1.0f },
+	{ 29.50f, -1.0f },
+	{ 30.00f, -1.0f },
+	{ 30.50f, -1.0f },
+	{ 31.00f, -1.0f },
+	{ 31.50f, -1.0f },
+	{ 32.00f, -1.0f },
+	{ 32.50f, -1.0f },
+	{ 33.00f, -1.0f },
+	{ 33.50f, -1.0f },
+	{ 34.00f, -1.0f },
+	{ 34.50f, -1.0f },
+	{ 35.00f, -1.0f },
+	{ 35.50f, -1.0f },
+	{ 36.00f, -1.0f },
+	{ 36.50f, -1.0f },
+	{ 37.00f, -1.0f },
+	{ 37.50f, -1.0f },
+	{ 38.00f, -1.0f },
+	{ 38.50f, -1.0f },
+	{ 39.00f, -1.0f },
+	{ 39.50f, -1.0f },
+	{ 40.00f, -1.0f },
+	{ 40.50f, -1.0f },
+	{ 41.00f, -1.0f },
+	{ 41.50f, -1.0f },
+	{ 42.00f, -1.0f },
+	{ 42.50f, -1.0f },
+	{ 43.00f, -1.0f },
+	{ 43.50f, -1.0f },
+	{ 44.00f, -1.0f },
+	{ 44.50f, -1.0f },
+	{ 45.00f, -1.0f },
+	{ 45.50f, -1.0f },
+	{ 46.00f, -1.0f },
+	{ 46.50f, -1.0f },
+	{ 47.00f, -1.0f },
+	{ 47.50f, -1.0f },
+	{ 48.00f, -1.0f },
+	{ 48.50f, -1.0f },
+	{ 49.00f, -1.0f },
+	{ 49.50f, -1.0f },
+	{ 50.00f, -1.0f },
+	{ 50.50f, -1.0f },
+	{ 51.00f, -1.0f },
+	{ 51.50f, -1.0f },
+	{ 52.00f, -1.0f }
 
-float flightPath[104 + 1][2];			// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
+};			// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
+
+
+//Values added for our version
+const float toRads = 0.017453293f;
+const float toDegs = 57.29577951f;
+
+float invSpeedSquareds[55] __attribute__((aligned(64))) =
+{
+	0.0399999991f,
+	0.0330578499f,
+	0.0277777780f,
+	0.0236686394f,
+	0.0204081628f,
+	0.0177777782f,
+	0.0156250000f,
+	0.0138408309f,
+	0.0123456791f,
+	0.0110803321f,
+	0.0099999998f,
+	0.0090702949f,
+	0.0082644625f,
+	0.0075614369f,
+	0.0069444445f,
+	0.0063999998f,
+	0.0059171598f,
+	0.0054869684f,
+	0.0051020407f,
+	0.0047562425f,
+	0.0044444446f,
+	0.0041623311f,
+	0.0039062500f,
+	0.0036730946f,
+	0.0034602077f,
+	0.0032653061f,
+	0.0030864198f,
+	0.0029218409f,
+	0.0027700830f,
+	0.0026298489f,
+	0.0024999999f,
+	0.0023795359f,
+	0.0022675737f,
+	0.0021633315f,
+	0.0020661156f,
+	0.0019753086f,
+	0.0018903592f,
+	0.0018107741f,
+	0.0017361111f,
+	0.0016659725f,
+	0.0016000000f,
+	0.0015378700f,
+	0.0014792900f,
+	0.0014239943f,
+	0.0013717421f,
+	0.0013223140f,
+	0.0012755102f,
+	0.0012311480f,
+	0.0011890606f,
+	0.0011490951f,
+	0.0011111111f,
+	0.0010749799f,
+	0.0010405828f,
+	0.0010078106f,
+	0.0009765625f
+
+};
 
 //************************************* MAIN ***********************************************************************
 int main(void)
 {
 	bool foundCombo(false);
 
-	getDistanceToKick(&distanceToGoal);	// comment this out if required
-	//distanceToGoal = 12.0F;  //***SHOT use this rather than entering it each run!
+	//getDistanceToKick(&distanceToGoal);	// comment this out if required
+	distanceToGoal = 12.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -185,51 +357,58 @@ int main(void)
 
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
-	// *** reminders ***
-	//const float minAngle(18.0)  ***SHOT reduced range of angles for assignment
-	//const float maxAngle(23.0)
-	//const float minSpeed(5.0)
-	//const float maxSpeed(32.0)
-	//const float crossBarHeight(3.0)
-
-	float nextSpeed;
+	//float nextSpeed;
 	float nextAngle(minAngle);	// Start with shallowest angle...
-	float height;
 
-	bool foundCombo(false);		// Found combination of speed and angle that gets ball over bar?
+	//const float negativeGravXSquared = -g * x * x;
 
-	while (!foundCombo && !(nextAngle > maxAngle))				// Think de Morgan's Theory, perhaps.
+	//const float eqInv2CosAngleSquared = 0.55279f;
+
+	float gXSqrOverCosAngleSqr = -g * x * x * 0.55279f;
+
+	const float cosInc = 0.00373f * -g * x * x;
+
+	//Last part of equation
+	float eqXTanAngle = 0.32492f * x;
+	const float tanInc = 0.009955f * x;
+
+	//float successHeight = crossBarHeight + margin;
+
+
+	do				// Think de Morgan's Theory, perhaps.
 	{
-		float AngleRads = (nextAngle * (Pi / 180.0F));			// Need radians for cos and tan functions
-		nextSpeed = minSpeed;									// reset minimum speed 
-
-		while (!foundCombo && !(nextSpeed > maxSpeed))
+		int speedIndex(0);
+		float nextSpeed(minSpeed);
+		do
 		{
-			// Figure out height of ball at goal post distance (x), using classic trajectory equation...
-			//
-			//			height =  (-g * x^2)/(2 * cos(angle)^2 * speed^2) + (x * tan(angle))
-			//
-			// If this is > cross bar height (plus any margin allowed) then result! 
-			// Note: height could become negative if ball hits ground short of posts (and theoretically keeps going underground!).
-			// Note: Max horizontal distance can be calculated from = (speed^2) * sin(2*angle)/g
 
-			height = ((-g * x*x) / (2.0F *cos(AngleRads) *cos(AngleRads) * (nextSpeed*nextSpeed))) + (x *tan(AngleRads));	//Phew!
+			float height = (gXSqrOverCosAngleSqr * invSpeedSquareds[speedIndex]) + eqXTanAngle;	//Phew!
 
-#ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
+#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
 			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
 #endif //_longTrace
 
-			if (height > crossBarHeight + margin)	// Success! 
+			if (height <= crossBarHeight + margin)// FAIL!
 			{
-				*speed = nextSpeed;			// Record the working combination...
-				*angle = nextAngle;
-				foundCombo = true;			// ... and stop looking.
+				nextSpeed += deltaD;
+				speedIndex++;
 			}
-			else nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).
-		}
+			else						// Otherwise SUCCESS!
+			{
+				*speed = nextSpeed;		// Record the working combination...
+				*angle = nextAngle;
+				return true;			// ... and stop looking.
+			}
+
+		} while (!(nextSpeed > maxSpeed));
+
 		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
-	}
-	return (foundCombo);
+		eqXTanAngle += tanInc;
+		gXSqrOverCosAngleSqr += cosInc;
+
+	} while (!(nextAngle > maxAngle));
+
+	return false;
 }
 
 // With metrics found, calculate the flight path coords. Uses 'flightPath[104][2]' array as global.
@@ -240,27 +419,35 @@ void generateFlightPath(float speed, float angle)
 	//const int maxDataPoints = 104
 	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
 
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
-	const float AngleRads = (angle * (Pi / 180.0F));	// Need radians for cos and tan functions 
+
+	const int speedIndex = (speed - 5) * 2;
+	const int angleIndex = (angle - 18) * 2;
+
+
+	//////////////////////////
+	float test = (0.55279f + (0.00373f * angleIndex));
+	const float gOverCosAngleSqr = -g * (0.55279f + (0.00373f * angleIndex));
+
+	float invSpeedSquare = invSpeedSquareds[speedIndex];
+	float invAllG = gOverCosAngleSqr * invSpeedSquare;
+	float tanAngleRads = 0.32492f + (0.009955f * angleIndex);
 
 	int i(0);
-	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
+	do
 	{
-		flightPath[i][x] = xValue;	// store data points
 		flightPath[i][y] = yValue;
-		xValue += deltaD;			// do for each increment tick across the pitch
+		xValue += deltaD;
 
-		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
-		yValue = ((-g * xValue * xValue) / (2.0F * cos(AngleRads) * cos(AngleRads) * (speed * speed))) + (xValue * tan(AngleRads));
-	}
+		i++;
+		yValue = (xValue* xValue * invAllG) + (xValue * tanAngleRads);
+
+	} while (i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight));
+
 	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
 	flightPath[i][x] = dataEnd;
-	flightPath[i][y] = dataEnd;
 }
-
-
-
 
 
 
