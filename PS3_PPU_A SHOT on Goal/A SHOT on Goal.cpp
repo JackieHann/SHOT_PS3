@@ -15,8 +15,8 @@ Units are (m) metres, (s) seconds, (deg) degrees, all float values.
 Adrian Oram, March 2017 (not a rugby supporter, so don't ask!)
 */
 
-#define yourName     "Adrian Oram"				// Please change these as appropriate!
-#define yourTeamName "Fulchester RC"
+#define yourName     "Jake Hanne & Alex Fullarton"				// Please change these as appropriate!
+#define yourTeamName "?"
 
 #define _PS3		// Build for PS3 system otherwise x86 if commented out. (You will need to create an x86 project and paste all required files across.)
 //#define _trace	// comment out to remove trace output used for testing
@@ -101,12 +101,14 @@ const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, c
 
 float flightPath[104 + 1][2];			// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
 
+//Values added for 
 //************************************* MAIN ***********************************************************************
 int main(void)
 {
 	bool foundCombo(false);
 
-	getDistanceToKick(&distanceToGoal);
+	//getDistanceToKick(&distanceToGoal);
+	distanceToGoal = 12;
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
