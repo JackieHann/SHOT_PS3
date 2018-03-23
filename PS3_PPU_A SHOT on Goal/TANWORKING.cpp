@@ -105,73 +105,13 @@ float flightPath[104 + 1][2];			// x,y coords (m,m) of ball flight. The sequence
 const float toRads = 0.017453293f;
 const float toDegs = 57.29577951f;
 
-float invSpeedSquareds[55] =
-{
-	0.0399999991f,
-	0.0330578499f,
-	0.0277777780f,
-	0.0236686394f,
-	0.0204081628f,
-	0.0177777782f,
-	0.0156250000f,
-	0.0138408309f,
-	0.0123456791f,
-	0.0110803321f,
-	0.0099999998f,
-	0.0090702949f,
-	0.0082644625f,
-	0.0075614369f,
-	0.0069444445f,
-	0.0063999998f,
-	0.0059171598f,
-	0.0054869684f,
-	0.0051020407f,
-	0.0047562425f,
-	0.0044444446f,
-	0.0041623311f,
-	0.0039062500f,
-	0.0036730946f,
-	0.0034602077f,
-	0.0032653061f,
-	0.0030864198f,
-	0.0029218409f,
-	0.0027700830f,
-	0.0026298489f,
-	0.0024999999f,
-	0.0023795359f,
-	0.0022675737f,
-	0.0021633315f,
-	0.0020661156f,
-	0.0019753086f,
-	0.0018903592f,
-	0.0018107741f,
-	0.0017361111f,
-	0.0016659725f,
-	0.0016000000f,
-	0.0015378700f,
-	0.0014792900f,
-	0.0014239943f,
-	0.0013717421f,
-	0.0013223140f,
-	0.0012755102f,
-	0.0012311480f,
-	0.0011890606f,
-	0.0011490951f,
-	0.0011111111f,
-	0.0010749799f,
-	0.0010405828f,
-	0.0010078106f,
-	0.0009765625f
-
-};
-
 //************************************* MAIN ***********************************************************************
 int main(void)
 {
 	bool foundCombo(false);
 
 	//getDistanceToKick(&distanceToGoal);
-	distanceToGoal = 12;
+	distanceToGoal = 50;
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -243,54 +183,53 @@ int main(void)
 
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
+	// *** reminders ***
+	//const float minAngle(18.0)
+	//const float maxAngle(23.0)
+	//const float minSpeed(5.0)
+	//const float maxSpeed(32.0)
+	//const float crossBarHeight(3.0)
 
-	//float nextSpeed;
+	float nextSpeed;
 	float nextAngle(minAngle);	// Start with shallowest angle...
+	float height;
 
-	//const float negativeGravXSquared = -g * x * x;
+	//bool foundCombo(false);		// Found combination of speed and angle that gets ball over bar?
 
-	//const float eqInv2CosAngleSquared = 0.55279f;
-
-	float gXSqrOverCosAngleSqr = -g * x * x * 0.55279f;
-	const float cosInc = 0.00373f * -g * x * x;
-	 
-	//Last part of equation
-	float eqXTanAngle = 0.32492f * x;
-	const float tanInc = 0.009955f * x;
-
-	float successHeight = crossBarHeight + margin;
-
+	float negativeGravXSquared = -g * x * x;
+	float eqTanAngle = 0.32492f;
+	float tanInc = 0.009955f;
 
 	do				// Think de Morgan's Theory, perhaps.
 	{
-		int speedIndex(0);
-		float nextSpeed(minSpeed);
+		float AngleRads = (nextAngle * toRads);			// Need radians for cos and tan functions
+		nextSpeed = minSpeed;									// reset minimum speed 
+
+		const float twoCosAngleSquared = 2.0F *cos(AngleRads) *cos(AngleRads);
+		const float xTanAngle = x * eqTanAngle;
+
 		do
 		{
 
-			float height = (gXSqrOverCosAngleSqr * invSpeedSquareds[speedIndex]) + eqXTanAngle;	//Phew!
+			height = (negativeGravXSquared / (twoCosAngleSquared * (nextSpeed*nextSpeed))) + (xTanAngle);	//Phew!
 			
-																																																									#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
-																																																												cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
-																																																									#endif //_longTrace
+			#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
+						cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
+			#endif //_longTrace
 
-			if (height <= successHeight)// FAIL!
+			if (height > crossBarHeight + margin)	// Success! 
 			{
-				nextSpeed += deltaD;
-				speedIndex++;
-			}
-			else						// Otherwise SUCCESS!
-			{
-				*speed = nextSpeed;		// Record the working combination...
+				*speed = nextSpeed;			// Record the working combination...
 				*angle = nextAngle;
 				return true;			// ... and stop looking.
 			}
 
+			else nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).
+
 		} while (!(nextSpeed > maxSpeed));
 
 		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
-		eqXTanAngle += tanInc;
-		//gXSqrOverCosAngleSqr += cosInc;
+		eqTanAngle += tanInc;
 
 	} while (!(nextAngle > maxAngle));
 
