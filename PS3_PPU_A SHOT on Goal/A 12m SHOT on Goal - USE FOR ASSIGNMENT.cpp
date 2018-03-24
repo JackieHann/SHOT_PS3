@@ -286,7 +286,7 @@ int main(void)
 	bool foundCombo(false);
 
 	//getDistanceToKick(&distanceToGoal);	// comment this out if required
-	distanceToGoal = 50.0F;  //***SHOT use this rather than entering it each run!
+	distanceToGoal = 10.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -460,7 +460,7 @@ void generateFlightPath(float speed, float angle)
 		"	la		3, %[fPath]				\n"
 		"	subi	3, 3, 0x04				\n"
 		"	lfs		11, %[deltaDLocal]		\n"
-
+	
 		//Calculate constant math variables
 		"	fmuls	4, 4, 4					\n"	//cosAngle * cosAngle (f4)
 		"	fmuls	6, 6, 6					\n"	//speed * speed (f6)
@@ -474,14 +474,14 @@ void generateFlightPath(float speed, float angle)
 		
 		//Contents of Do While Loop
 		"	stfsu	3, 0x08(3)				\n" // store yValue (fr3) into flightPath
-
+	
 		"	fadds	12, 12, 11				\n" // xValue += deltaD
-
+	
 		"	addi	10, 10, 0x01				\n" // increment i++;
-
+	
 		"	fmadd	3, 12, 4, 5				\n"
 		"	fmuls	3, 3, 12				\n"
-
+	
 		//While loop Continuation conditions
 		"	cmp		0, 9, 10			\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r2) store flags in CR0
 		"	fcmpu	1, 3, 2			\n" //Compare yValue(fr3) to zero(fr2) store flags in CR1 
@@ -490,14 +490,14 @@ void generateFlightPath(float speed, float angle)
 		"	crand	18, 14, 9		\n"	//Compare greater than flags of CR3 and CR2, store resulting bit in crb18(CR4)
 		//Branch back to start of Do While Loop
 		"	bc		12, 18, doWhile \n" // if (i < maxDataPoints) && (yValue > 0.0) && (yValue <= maxHeight), loop again;
-
-
+	
+	
 		//Outside of do while loop
 		"	subi	3, 3, 0x04		\n"
 		"	fneg	7, 7			\n"
 		"	stfsu	7, 0x0(3)		\n"
-
-
+	
+	
 		:
 		: [cosAngle] "m" (cosAngle), 
 		  [tanAngle] "m" (tanAngle), 
@@ -511,7 +511,7 @@ void generateFlightPath(float speed, float angle)
 		  [fPath] "m" (flightPath[0][0]),
 		  [deltaDLocal] "m" (deltaDLocal)
 		  : "fr4", "fr2", "fr3", "fr5", "fr6", "fr7", "fr8", "fr10", "r9", "r2", "r3", "fr11"
-
+	
 		);
 }
 
