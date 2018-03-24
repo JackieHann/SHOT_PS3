@@ -358,14 +358,17 @@ int main(void)
 
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
-	float nextAngle(minAngle);
-	float gXSqrOverCosAngleSqr = -g * x * x * 0.55279f;
-	const float cosInc = 0.00373f * -g * x * x;
+	float nextAngle = minAngle;
+
+	const float xSquared = x * x;
+	const float gXSquared = -g * xSquared;
+	float gXSqrOverCosAngleSqr = gXSquared * 0.55279f;
+	const float cosInc = 0.00373f * gXSquared;
 
 	float eqXTanAngle = 0.32492f * x;
 	const float tanInc = 0.009955f * x;
 
-	float successHeight = crossBarHeight + margin;
+	const float successHeight = crossBarHeight + margin;
 
 	do
 	{
@@ -407,16 +410,16 @@ void generateFlightPath(float speed, float angle)
 {
 	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
-
-	const int speedIndex = ((speed - 5) * 2);
 	
-	const float AngleRads = (angle * toRads);	// Need radians for cos and tan functions 
+	const float AngleRads = angle * toRads;	// Need radians for cos and tan functions 
 	const float cosAngleRads = cos(AngleRads);
 	const float cosAngleRadsSquare = cosAngleRads * cosAngleRads;
-	const float invTwoCosAngleRadsSquare = 1 / (2.0f * cosAngleRadsSquare);
+	const float speedSquared = speed * speed;
+	const float cosAngleRadsSquareSpeedSquare = cosAngleRadsSquare * speedSquared;
+	const float all = 2 * cosAngleRadsSquareSpeedSquare;
+	const float invTwoCosAngleRadsSquare = 1 / all;
 
-	const float invTwoCosAndSpeed = invTwoCosAngleRadsSquare * invSpeedSquareds[speedIndex];
-	const float invAllG = -g * invTwoCosAndSpeed;
+	const float invAllG = -g * invTwoCosAngleRadsSquare;
 
 	const float tanAngleRads = tan(AngleRads);
 
@@ -427,10 +430,35 @@ void generateFlightPath(float speed, float angle)
 		xValue += deltaD;
 
 		i++;
-		yValue = ((xValue * xValue) * invAllG) + (xValue * tanAngleRads);
-	} while (i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight));
+		yValue = (xValue * ((xValue * invAllG) + (tanAngleRads)));
+	} while (!(!(i < maxDataPoints) || !(yValue > 0.0) || !((yValue <= maxHeight))));
 
 	flightPath[i][x] = dataEnd;
+
+	asm volatile (
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+		"														\n"
+
+		:
+		:
+		:
+		);
 }
 
 //************************************ Supporting functions *******************************************************
