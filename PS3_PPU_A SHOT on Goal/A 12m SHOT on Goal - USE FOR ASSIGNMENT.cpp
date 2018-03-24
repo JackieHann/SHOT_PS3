@@ -97,7 +97,7 @@ const float goalPostHeight(7.0F);		// (m) Upto 16m usually. Don't make higher, i
 float distanceToGoal;					// (m) Kicking distance, input by user.
 
 // Final flight path of ball as a series of x,y coordinates
-const float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
+float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
 const float deltaY(0.25F);			// (m) increment in the height direction (vertical exaggeration of x2)
 const float yScale = 1.0F / deltaY;	// vertical scaling factor
 const float xScale = 1.0F / deltaD;	// horizontal scaling factor
@@ -217,7 +217,7 @@ float flightPath[104 + 1][2] __attribute__((aligned(64))) =
 };
 
 //Values added for our version
-const float toRads = 0.017453293f;
+const float torads = 0.017453293f;
 const float toDegs = 57.29577951f;
 
 float invSpeedSquareds[55]  __attribute__((aligned(64))) =
@@ -286,7 +286,7 @@ int main(void)
 	bool foundCombo(false);
 
 	//getDistanceToKick(&distanceToGoal);	// comment this out if required
-	distanceToGoal = 12.0F;  //***SHOT use this rather than entering it each run!
+	distanceToGoal = 50.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -409,55 +409,109 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 void generateFlightPath(float speed, float angle)
 {
 	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
-	float xValue(0.0F);		// ...and hasn't moved yet.
+	//float xValue(0.0F);		// ...and hasn't moved yet.
+	//
+	//const float AngleRads = angle * torads;	// Need radians for cos and tan functions 
+	//const float cosAngleRads = cos(AngleRads);
+	//const float cosAngleRadsSquare = cosAngleRads * cosAngleRads;
+	//const float speedSquared = speed * speed;
+	//const float cosAngleRadsSquareSpeedSquare = cosAngleRadsSquare * speedSquared;
+	//const float all = 2 * cosAngleRadsSquareSpeedSquare;
+	//const float invTwoCosAngleRadsSquare = 1 / all;
+	//
+	//const float invAllG = -g * invTwoCosAngleRadsSquare;
+	//
+	//const float tanAngleRads = tan(AngleRads);
+	//
+	//int i(0);
+	//do
+	//{
+	//	flightPath[i][y] = yValue;
+	//	xValue += deltaD;
+	//
+	//	i++;
+	//	yValue = (xValue * ((xValue * invAllG) + (tanAngleRads)));
+	//} while (!(!(i < maxDataPoints) || !(yValue > 0.0) || !((yValue <= maxHeight))));
 	
-	const float AngleRads = angle * toRads;	// Need radians for cos and tan functions 
-	const float cosAngleRads = cos(AngleRads);
-	const float cosAngleRadsSquare = cosAngleRads * cosAngleRads;
-	const float speedSquared = speed * speed;
-	const float cosAngleRadsSquareSpeedSquare = cosAngleRadsSquare * speedSquared;
-	const float all = 2 * cosAngleRadsSquareSpeedSquare;
-	const float invTwoCosAngleRadsSquare = 1 / all;
+	//flightPath[i][x] = dataEnd;
 
-	const float invAllG = -g * invTwoCosAngleRadsSquare;
+	float zero(0.0);
+	float one(1.0);
+	float cosAngle = cos(angle * torads);
+	float tanAngle = tan(angle * torads);
+	float invG = -g;
+	float deltaDLocal = deltaD;
 
-	const float tanAngleRads = tan(AngleRads);
-
-	int i(0);
-	do
-	{
-		flightPath[i][y] = yValue;
-		xValue += deltaD;
-
-		i++;
-		yValue = (xValue * ((xValue * invAllG) + (tanAngleRads)));
-	} while (!(!(i < maxDataPoints) || !(yValue > 0.0) || !((yValue <= maxHeight))));
-
-	flightPath[i][x] = dataEnd;
+	int maxDataPointsLocal = maxDataPoints;
+	float maxHeightLocal = maxHeight + 1;
 
 	asm volatile (
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
-		"														\n"
+		//initial loading
+		"	lfs		2, %[zero]				\n"	//Store xValue in float register 2
+		"	fmr		12, 2					\n"	
+		"	lfs		3, %[yValue]			\n"	//Store yValue in float register 3 (0.001)
+		"	lfs		4, %[cosAngle]			\n" //Store cos value of angle passed in (fr4)
+		"	lfs		5, %[tanAngle]			\n"	//Store tan value of angle passed in (fr5)
+		"	lfs		6, %[speed]				\n"	//Store speed passed in (fr6)
+		"	lfs		7, %[one]				\n" //Store one in (fr7)	
+		"	lfs		8, %[invG]				\n" //Store inverse gravity into (fr8)
+		"	lwz		9, %[maxDataPointsLocal]\n"
+		"	lfs		10, %[maxHeightLocal]	\n"
+		"	la		3, %[fPath]				\n"
+		"	subi	3, 3, 0x04				\n"
+		"	lfs		11, %[deltaDLocal]		\n"
+
+		//Calculate constant math variables
+		"	fmuls	4, 4, 4					\n"	//cosAngle * cosAngle (f4)
+		"	fmuls	6, 6, 6					\n"	//speed * speed (f6)
+		"	fmuls	4, 4, 6					\n"	//cosAngle^2 + speed^2 (f4)
+		"	fadds	4, 4, 4					\n"	//2 * (cosAngle^2 + speed^2) (f4)
+		"	fdivs	4, 7, 4					\n"	//1 / above (f4)
+		"	fmuls	4, 8, 4					\n"	//-g(f8) * (1 / above)(f4)
+		"	xor		10, 10, 10					\n" //set i (r2) to be 0 via xor
+		
+		"	doWhile:						\n"		//Start of Do While Loop
+		
+		//Contents of Do While Loop
+		"	stfsu	3, 0x08(3)				\n" // store yValue (fr3) into flightPath
+
+		"	fadds	12, 12, 11				\n" // xValue += deltaD
+
+		"	addi	10, 10, 0x01				\n" // increment i++;
+
+		"	fmadd	3, 12, 4, 5				\n"
+		"	fmuls	3, 3, 12				\n"
+
+		//While loop Continuation conditions
+		"	cmp		0, 9, 10			\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r2) store flags in CR0
+		"	fcmpu	1, 3, 2			\n" //Compare yValue(fr3) to zero(fr2) store flags in CR1 
+		"	fcmpu	2, 10, 3		\n" //Compare yValue(fr3) to maxHeightLocal(fr10) store flags in CR2
+		"	crand	14, 1, 5		\n" //Compare greater than flags of CR0 and CR1, store resulting bit in crb14(CR3)
+		"	crand	18, 14, 9		\n"	//Compare greater than flags of CR3 and CR2, store resulting bit in crb18(CR4)
+		//Branch back to start of Do While Loop
+		"	bc		12, 18, doWhile \n" // if (i < maxDataPoints) && (yValue > 0.0) && (yValue <= maxHeight), loop again;
+
+
+		//Outside of do while loop
+		"	subi	3, 3, 0x04		\n"
+		"	fneg	7, 7			\n"
+		"	stfsu	7, 0x0(3)		\n"
+
 
 		:
-		:
-		:
+		: [cosAngle] "m" (cosAngle), 
+		  [tanAngle] "m" (tanAngle), 
+		  [zero] "m" (zero), 
+		  [yValue] "m"(yValue),
+		  [speed] "m" (speed), 
+		  [one] "m" (one), 
+		  [invG] "m" (invG), 
+		  [maxDataPointsLocal] "m" (maxDataPointsLocal), 
+		  [maxHeightLocal] "m" (maxHeightLocal),
+		  [fPath] "m" (flightPath[0][0]),
+		  [deltaDLocal] "m" (deltaDLocal)
+		  : "fr4", "fr2", "fr3", "fr5", "fr6", "fr7", "fr8", "fr10", "r9", "r2", "r3", "fr11"
+
 		);
 }
 
