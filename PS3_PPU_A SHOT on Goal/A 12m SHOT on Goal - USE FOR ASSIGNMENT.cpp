@@ -97,7 +97,7 @@ const float goalPostHeight(7.0F);		// (m) Upto 16m usually. Don't make higher, i
 float distanceToGoal;					// (m) Kicking distance, input by user.
 
 // Final flight path of ball as a series of x,y coordinates
-float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
+const float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
 const float deltaY(0.25F);			// (m) increment in the height direction (vertical exaggeration of x2)
 const float yScale = 1.0F / deltaY;	// vertical scaling factor
 const float xScale = 1.0F / deltaD;	// horizontal scaling factor
@@ -286,7 +286,7 @@ int main(void)
 	bool foundCombo(false);
 
 	//getDistanceToKick(&distanceToGoal);	// comment this out if required
-	distanceToGoal = 50.0F;  //***SHOT use this rather than entering it each run!
+	distanceToGoal =9.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -358,19 +358,14 @@ int main(void)
 
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
-	float nextAngle = minAngle;
-
-	const float xSquared = x * x;
-	const float gXSquared = -g * xSquared;
-	float gXSqrOverCosAngleSqr = gXSquared * 0.55279f;
-	const float cosInc = 0.00373f * gXSquared;
-
-	float eqXTanAngle = 0.32492f * x;
-	const float tanInc = 0.009955f * x;
-
-	const float successHeight = crossBarHeight + margin;
-
-	do
+	//const float xSquared = x * x;
+	//const float gXSquared = -g * xSquared;
+	//float gXSqrOverCosAngleSqr = gXSquared * 0.55279f;
+	//const float cosInc = 0.00373f * gXSquared;
+	//float eqXTanAngle = 0.32492f * x;
+	//const float tanInc = 0.009955f * x;
+	
+	/*do
 	{
 		int speedIndex(0);
 		float nextSpeed(minSpeed);
@@ -378,10 +373,6 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		{
 
 			float height = (gXSqrOverCosAngleSqr * invSpeedSquareds[speedIndex]) + eqXTanAngle;
-
-#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
-			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
-#endif //_longTrace
 
 			if (height <= successHeight)
 			{
@@ -402,13 +393,107 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		gXSqrOverCosAngleSqr += cosInc;
 
 	} while (!(nextAngle > maxAngle));
-	return false;
+	return false;*/
+
+	float nextAngle = minAngle;
+	float grav = -g;
+	float cosAng = 0.55279f;
+	float cosIncrement = 0.00373f;
+	float tanAng = 0.32492f;
+	float tanIncrement = 0.009955f;
+	float successHeight = crossBarHeight + margin;
+	float minimumSpeed = minSpeed;
+	float deltaDLocal = deltaD;
+	float maximumSpeed = maxSpeed;
+	float maximumAngle = maxAngle;
+
+	asm volatile (
+		//initial loading
+		"		lfs		2, %[nextAngle]							\n" //Store starting angle value into (fr2)
+		"		lfs		3, %[distance]							\n" //Store distance value into (fr3)
+		"		lfs		4, %[grav]								\n" //Store -g into (fr4)
+		"		fmuls	4, 4, 3									\n" //-g * distance
+		"		fmuls	4, 4, 3									\n" //-g * distance * distance
+		"		lfs		5, %[cosAng]							\n" //Store initial cos of angle * maths into (fr5)
+		"		fmuls	5, 5, 4									\n" //-g * distance * distance / 2 * cos(Angle) * cos(Angle)
+		"		lfs		6, %[cosIncrement]						\n" //Store cos angle increment into (fr6)
+		"		fmuls	6, 6, 4									\n" //cosIncrement * -g * distance * distance
+		"		lfs		7, %[tanAng]							\n" //Store initial tan of angle into (fr7)
+		"		fmuls	7, 7, 3									\n" //tanAng * distance
+		"		lfs		8, %[tanIncrement]						\n" //Store tan angle increment into (fr8)
+		"		fmuls	8, 8, 3									\n" //tanIncrement * distance
+		"		lfs		9, %[successHeight]						\n" //Store success height into (fr9)
+		"		lfs		10, %[minimumSpeed]						\n" //Store minimum speed into (fr10)
+		"		lfs		12, %[deltaDLocal]						\n" //Store deltaD into (fr12)
+		"		lfs		14, %[maximumSpeed]						\n" //Store maximum speed into (fr14)
+		"		lfs		15, %[maximumAngle]						\n" //Store maximun angle into (fr15)
+
+		"		doWhile1:										\n" //First do while loop	
+
+		"			xor		3, 3, 3								\n" //Initialise to zero
+		"			fmr		13, 10								\n" //Copy speed into (fr13)		
+		"			la		4, %[invSpeed]						\n" //Store address of inverse speed squared array at [0] into (r4)
+		"			subi	4, 4, 0x04							\n" //Place pointer to array in proper place
+
+		"			doWhile2:									\n" //Second do while loop
+
+		"				lfsu	11, 0x04(4)						\n" //Get array value at position index		
+		"				fmadd	11, 11, 5, 7					\n" //Get height and store in (fr11)
+		"				fcmpu	1, 11, 9						\n"	//height > successHeight - set CR flags
+
+		//Conditional if height > successHeight
+
+		"				bc		12, 5, success					\n"	//check CR1, crb5, if greater than
+
+		//Else
+		"				fadd	13, 13, 12						\n" //increment speed by deltaD
+		"				fcmpu	2, 13, 14						\n" //nextSpeed > maximumSpeed - set CR flags
+		"				bc		4, 9, doWhile2					\n" //if next speed isnt greater, repeat loop
+
+		"			fadd	2, 2, 12							\n" //increment nextAngle by deltaD
+		"			fadd	7, 7, 8								\n" //increment tanAngle by tanIncrement
+		"			fadd	5, 5, 6								\n" //increment cosAngle by cosIncrement
+		"			fcmpu	3, 2, 15							\n" //nextAngle > maximumAngle - set CR flags
+		"			bc		4, 13, doWhile1						\n" //if angle isnt greater, repeat loop
+
+		"		xor		5, 5, 5									\n" //Clear register to enter return value - set to false
+		"		la		3, 0x00(5)								\n" //Return address of return value
+		"		b		end										\n" //branch to end
+
+		//if returns true
+		"		success:										\n"
+		"			stfs	2, %[retAngle]						\n" //Store calculated angle in retAngle
+		"			stfs	13, %[retSpeed]						\n" //Store calculatd speed in retSpeed
+		"			xor		5, 5, 5								\n" //Clear register to enter return value
+		"			addi	5, 5, 0x01							\n" //Return value = true
+		"			la		3, 0x00(5)							\n" //Return address of return value
+		"		end:											\n"	//fin
+
+		
+
+		: [retAngle] "=m" (*angle),
+		  [retSpeed] "=m" (*speed)
+		: [nextAngle] "m" (nextAngle),
+		  [distance] "m" (x),
+		  [grav] "m" (grav),
+		  [cosAng] "m" (cosAng),
+		  [cosIncrement] "m" (cosIncrement),
+		  [tanAng] "m" (tanAng),
+		  [tanIncrement] "m" (tanIncrement),
+		  [successHeight] "m" (successHeight),
+		  [minimumSpeed] "m" (minimumSpeed),
+		  [invSpeed] "m" (invSpeedSquareds[0]),
+		  [deltaDLocal] "m" (deltaDLocal),
+		  [maximumSpeed] "m" (maximumSpeed),
+		  [maximumAngle] "m" (maximumAngle)
+		  : "fr2", "fr3", "fr4", "fr5", "fr6", "fr7", "fr12", "fr9", "fr10", "fr11", "fr12", "fr14", "fr15", "r4", "r5", "r1"
+
+		);
 }
 
 // With metrics found, calculate the flight path coords. Uses 'flightPath[104][2]' array as global.
 void generateFlightPath(float speed, float angle)
 {
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	//float xValue(0.0F);		// ...and hasn't moved yet.
 	//
 	//const float AngleRads = angle * torads;	// Need radians for cos and tan functions 
@@ -435,68 +520,64 @@ void generateFlightPath(float speed, float angle)
 	
 	//flightPath[i][x] = dataEnd;
 
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	float zero(0.0);
 	float one(1.0);
 	float cosAngle = cos(angle * torads);
 	float tanAngle = tan(angle * torads);
 	float invG = -g;
 	float deltaDLocal = deltaD;
-
 	int maxDataPointsLocal = maxDataPoints;
 	float maxHeightLocal = maxHeight + 1;
 
 	asm volatile (
 		//initial loading
-		"	lfs		2, %[zero]				\n"	//Store xValue in float register 2
-		"	fmr		12, 2					\n"	
-		"	lfs		3, %[yValue]			\n"	//Store yValue in float register 3 (0.001)
-		"	lfs		4, %[cosAngle]			\n" //Store cos value of angle passed in (fr4)
-		"	lfs		5, %[tanAngle]			\n"	//Store tan value of angle passed in (fr5)
-		"	lfs		6, %[speed]				\n"	//Store speed passed in (fr6)
-		"	lfs		7, %[one]				\n" //Store one in (fr7)	
-		"	lfs		8, %[invG]				\n" //Store inverse gravity into (fr8)
-		"	lwz		9, %[maxDataPointsLocal]\n"
-		"	lfs		10, %[maxHeightLocal]	\n"
-		"	la		3, %[fPath]				\n"
-		"	subi	3, 3, 0x04				\n"
-		"	lfs		11, %[deltaDLocal]		\n"
+		"	lfs		2, %[zero]						\n"	//Store xValue in float register 2
+		"	fmr		12, 2							\n"	//Copy zero value from fr2 into fr12
+		"	lfs		3, %[yValue]					\n"	//Store yValue in float register 3 (0.001)
+		"	lfs		4, %[cosAngle]					\n" //Store cos value of angle passed in (fr4)
+		"	lfs		5, %[tanAngle]					\n"	//Store tan value of angle passed in (fr5)
+		"	lfs		6, %[speed]						\n"	//Store speed passed in (fr6)
+		"	lfs		7, %[one]						\n" //Store one in (fr7)	
+		"	lfs		8, %[invG]						\n" //Store inverse gravity into (fr8)
+		"	lwz		9, %[maxDataPointsLocal]		\n"	//Store maximum data points into (r9)
+		"	lfs		10, %[maxHeightLocal]			\n" //Store maximum graph height into (fr10)
+		"	la		3, %[fPath]						\n" //Store address of flight path array at [0][0] into (r3)
+		"	subi	3, 3, 0x04						\n"	//Create offset for the above address to access y values in memory
+		"	lfs		11, %[deltaDLocal]				\n"	//Store delteD value into (fr11)
 
 		//Calculate constant math variables
-		"	fmuls	4, 4, 4					\n"	//cosAngle * cosAngle (f4)
-		"	fmuls	6, 6, 6					\n"	//speed * speed (f6)
-		"	fmuls	4, 4, 6					\n"	//cosAngle^2 + speed^2 (f4)
-		"	fadds	4, 4, 4					\n"	//2 * (cosAngle^2 + speed^2) (f4)
-		"	fdivs	4, 7, 4					\n"	//1 / above (f4)
-		"	fmuls	4, 8, 4					\n"	//-g(f8) * (1 / above)(f4)
-		"	xor		10, 10, 10					\n" //set i (r2) to be 0 via xor
+		"	fmuls	4, 4, 4							\n"	//cosAngle * cosAngle (f4)
+		"	fmuls	6, 6, 6							\n"	//speed * speed (f6)
+		"	fmuls	4, 4, 6							\n"	//cosAngle^2 + speed^2 (f4)
+		"	fadds	4, 4, 4							\n"	//2 * (cosAngle^2 + speed^2) (f4)
+		"	fdivs	4, 7, 4							\n"	//1 / above (f4)
+		"	fmuls	4, 8, 4							\n"	//-g(f8) * (1 / above)(f4)
+		"	xor		10, 10, 10						\n" //set i (r) to be 0 via xor
 		
-		"	doWhile:						\n"		//Start of Do While Loop
+		//doWhile Loop
+		"	doWhile:								\n"	//Start of Do While Loop
 		
 		//Contents of Do While Loop
-		"	stfsu	3, 0x08(3)				\n" // store yValue (fr3) into flightPath
-
-		"	fadds	12, 12, 11				\n" // xValue += deltaD
-
-		"	addi	10, 10, 0x01				\n" // increment i++;
-
-		"	fmadd	3, 12, 4, 5				\n"
-		"	fmuls	3, 3, 12				\n"
+		"	stfsu	3, 0x08(3)						\n" //store yValue (fr3) into flightPath at each y position
+		"	fadds	12, 12, 11						\n" //xValue += deltaD
+		"	addi	10, 10, 0x01					\n" //increment i++;
+		"	fmadd	3, 12, 4, 5						\n" //(xValue * invAllG) + (tanAngleRads)
+		"	fmuls	3, 3, 12						\n" //(xValue * ((xValue * invAllG) + (tanAngleRads))) stored in yValue (fr3)
 
 		//While loop Continuation conditions
-		"	cmp		0, 9, 10			\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r2) store flags in CR0
-		"	fcmpu	1, 3, 2			\n" //Compare yValue(fr3) to zero(fr2) store flags in CR1 
-		"	fcmpu	2, 10, 3		\n" //Compare yValue(fr3) to maxHeightLocal(fr10) store flags in CR2
-		"	crand	14, 1, 5		\n" //Compare greater than flags of CR0 and CR1, store resulting bit in crb14(CR3)
-		"	crand	18, 14, 9		\n"	//Compare greater than flags of CR3 and CR2, store resulting bit in crb18(CR4)
+		"	cmp		0, 9, 10						\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r2) store flags in CR0
+		"	fcmpu	1, 3, 2							\n" //Compare yValue(fr3) to zero(fr2) store flags in CR1 
+		"	fcmpu	2, 10, 3						\n" //Compare yValue(fr3) to maxHeightLocal(fr10) store flags in CR2
+		"	crand	14, 1, 5						\n" //Compare greater than flags of CR0 and CR1, store resulting bit in crb14(CR3)
+		"	crand	18, 14, 9						\n"	//Compare greater than flags of CR3 and CR2, store resulting bit in crb18(CR4)
 		//Branch back to start of Do While Loop
-		"	bc		12, 18, doWhile \n" // if (i < maxDataPoints) && (yValue > 0.0) && (yValue <= maxHeight), loop again;
-
+		"	bc		12, 18, doWhile					\n" //if (i < maxDataPoints) && (yValue > 0.0) && (yValue <= maxHeight), loop again;
 
 		//Outside of do while loop
-		"	subi	3, 3, 0x04		\n"
-		"	fneg	7, 7			\n"
-		"	stfsu	7, 0x0(3)		\n"
-
+		"	subi	3, 3, 0x04						\n" //change offset of the array address to point to the final xValue
+		"	fneg	7, 7							\n" //Move -1 to (fr7)
+		"	stfsu	7, 0x0(3)						\n" //Add -1 to last xValue in array (end character)
 
 		:
 		: [cosAngle] "m" (cosAngle), 
@@ -510,7 +591,7 @@ void generateFlightPath(float speed, float angle)
 		  [maxHeightLocal] "m" (maxHeightLocal),
 		  [fPath] "m" (flightPath[0][0]),
 		  [deltaDLocal] "m" (deltaDLocal)
-		  : "fr4", "fr2", "fr3", "fr5", "fr6", "fr7", "fr8", "fr10", "r9", "r2", "r3", "fr11"
+		  : "fr2", "fr3", "fr4", "fr5", "fr6", "fr7", "fr8", "fr10", "fr11", "r9", "r3"
 
 		);
 }
