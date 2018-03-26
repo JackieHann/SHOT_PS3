@@ -101,120 +101,120 @@ const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, c
 
 float flightPath[104 + 1][2] __attribute__((aligned(64))) =
 {
-	{0.00f,	-1.0f},
-	{0.50f,	-1.0f},
-	{1.00f,	-1.0f},
-	{1.50f,	-1.0f},
-	{2.00f,	-1.0f},
-	{2.50f,	-1.0f},
-	{3.00f,	-1.0f},
-	{3.50f,	-1.0f},
-	{4.00f,	-1.0f},
-	{4.50f,	-1.0f},
-	{5.00f,	-1.0f},
-	{5.50f,	-1.0f},
-	{6.00f,	-1.0f},
-	{6.50f,	-1.0f},
-	{7.00f,	-1.0f},
-	{7.50f,	-1.0f},
-	{8.00f,	-1.0f},
-	{8.50f,	-1.0f},
-	{9.00f,	-1.0f},
-	{9.50f,	-1.0f},
-	{10.00f,-1.0f},
-	{10.50f,-1.0f},
-	{11.00f,-1.0f},
-	{11.50f,-1.0f},
-	{12.00f,-1.0f},
-	{12.50f,-1.0f},
-	{13.00f,-1.0f},
-	{13.50f,-1.0f},
-	{14.00f,-1.0f},
-	{14.50f,-1.0f},
-	{15.00f,-1.0f},
-	{15.50f,-1.0f},
-	{16.00f,-1.0f},
-	{16.50f,-1.0f},
-	{17.00f,-1.0f},
-	{17.50f,-1.0f},
-	{18.00f,-1.0f},
-	{18.50f,-1.0f},
-	{19.00f,-1.0f},
-	{19.50f,-1.0f},
-	{20.00f,-1.0f},
-	{20.50f,-1.0f},
-	{21.00f,-1.0f},
-	{21.50f,-1.0f},
-	{22.00f,-1.0f},
-	{22.50f,-1.0f},
-	{23.00f,-1.0f},
-	{23.50f,-1.0f},
-	{24.00f,-1.0f},
-	{24.50f,-1.0f},
-	{25.00f,-1.0f},
-	{25.50f,-1.0f},
-	{26.00f,-1.0f},
-	{26.50f,-1.0f},
-	{27.00f,-1.0f},
-	{27.50f,-1.0f},
-	{28.00f,-1.0f},
-	{28.50f,-1.0f},
-	{29.00f,-1.0f},
-	{29.50f,-1.0f},
-	{30.00f,-1.0f},
-	{30.50f,-1.0f},
-	{31.00f,-1.0f},
-	{31.50f,-1.0f},
-	{32.00f,-1.0f},
-	{32.50f,-1.0f},
-	{33.00f,-1.0f},
-	{33.50f,-1.0f},
-	{34.00f,-1.0f},
-	{34.50f,-1.0f},
-	{35.00f,-1.0f},
-	{35.50f,-1.0f},
-	{36.00f,-1.0f},
-	{36.50f,-1.0f},
-	{37.00f,-1.0f},
-	{37.50f,-1.0f},
-	{38.00f,-1.0f},
-	{38.50f,-1.0f},
-	{39.00f,-1.0f},
-	{39.50f,-1.0f},
-	{40.00f,-1.0f},
-	{40.50f,-1.0f},
-	{41.00f,-1.0f},
-	{41.50f,-1.0f},
-	{42.00f,-1.0f},
-	{42.50f,-1.0f},
-	{43.00f,-1.0f},
-	{43.50f,-1.0f},
-	{44.00f,-1.0f},
-	{44.50f,-1.0f},
-	{45.00f,-1.0f},
-	{45.50f,-1.0f},
-	{46.00f,-1.0f},
-	{46.50f,-1.0f},
-	{47.00f,-1.0f},
-	{47.50f,-1.0f},
-	{48.00f,-1.0f},
-	{48.50f,-1.0f},
-	{49.00f,-1.0f},
-	{49.50f,-1.0f},
-	{50.00f,-1.0f},
-	{50.50f,-1.0f},
-	{51.00f,-1.0f},
-	{51.50f,-1.0f},
-	{52.00f,-1.0f}
+	{ 0.0f, -1.0f },
+	{ 0.5f, -1.0f },
+	{ 1.0f, -1.0f },
+	{ 1.5f, -1.0f },
+	{ 2.0f, -1.0f },
+	{ 2.5f, -1.0f },
+	{ 3.0f, -1.0f },
+	{ 3.5f, -1.0f },
+	{ 4.0f, -1.0f },
+	{ 4.5f, -1.0f },
+	{ 5.0f, -1.0f },
+	{ 5.5f, -1.0f },
+	{ 6.0f, -1.0f },
+	{ 6.5f, -1.0f },
+	{ 7.0f, -1.0f },
+	{ 7.5f, -1.0f },
+	{ 8.0f, -1.0f },
+	{ 8.5f, -1.0f },
+	{ 9.0f, -1.0f },
+	{ 9.5f, -1.0f },
+	{ 10.0f, -1.0f },
+	{ 10.5f, -1.0f },
+	{ 11.0f, -1.0f },
+	{ 11.5f, -1.0f },
+	{ 12.0f, -1.0f },
+	{ 12.5f, -1.0f },
+	{ 13.0f, -1.0f },
+	{ 13.5f, -1.0f },
+	{ 14.0f, -1.0f },
+	{ 14.5f, -1.0f },
+	{ 15.0f, -1.0f },
+	{ 15.5f, -1.0f },
+	{ 16.0f, -1.0f },
+	{ 16.5f, -1.0f },
+	{ 17.0f, -1.0f },
+	{ 17.5f, -1.0f },
+	{ 18.0f, -1.0f },
+	{ 18.5f, -1.0f },
+	{ 19.0f, -1.0f },
+	{ 19.5f, -1.0f },
+	{ 20.0f, -1.0f },
+	{ 20.5f, -1.0f },
+	{ 21.0f, -1.0f },
+	{ 21.5f, -1.0f },
+	{ 22.0f, -1.0f },
+	{ 22.5f, -1.0f },
+	{ 23.0f, -1.0f },
+	{ 23.5f, -1.0f },
+	{ 24.0f, -1.0f },
+	{ 24.5f, -1.0f },
+	{ 25.0f, -1.0f },
+	{ 25.5f, -1.0f },
+	{ 26.0f, -1.0f },
+	{ 26.5f, -1.0f },
+	{ 27.0f, -1.0f },
+	{ 27.5f, -1.0f },
+	{ 28.0f, -1.0f },
+	{ 28.5f, -1.0f },
+	{ 29.0f, -1.0f },
+	{ 29.5f, -1.0f },
+	{ 30.0f, -1.0f },
+	{ 30.5f, -1.0f },
+	{ 31.0f, -1.0f },
+	{ 31.5f, -1.0f },
+	{ 32.0f, -1.0f },
+	{ 32.5f, -1.0f },
+	{ 33.0f, -1.0f },
+	{ 33.5f, -1.0f },
+	{ 34.0f, -1.0f },
+	{ 34.5f, -1.0f },
+	{ 35.0f, -1.0f },
+	{ 35.5f, -1.0f },
+	{ 36.0f, -1.0f },
+	{ 36.5f, -1.0f },
+	{ 37.0f, -1.0f },
+	{ 37.5f, -1.0f },
+	{ 38.0f, -1.0f },
+	{ 38.5f, -1.0f },
+	{ 39.0f, -1.0f },
+	{ 39.5f, -1.0f },
+	{ 40.0f, -1.0f },
+	{ 40.5f, -1.0f },
+	{ 41.0f, -1.0f },
+	{ 41.5f, -1.0f },
+	{ 42.0f, -1.0f },
+	{ 42.5f, -1.0f },
+	{ 43.0f, -1.0f },
+	{ 43.5f, -1.0f },
+	{ 44.0f, -1.0f },
+	{ 44.5f, -1.0f },
+	{ 45.0f, -1.0f },
+	{ 45.5f, -1.0f },
+	{ 46.0f, -1.0f },
+	{ 46.5f, -1.0f },
+	{ 47.0f, -1.0f },
+	{ 47.5f, -1.0f },
+	{ 48.0f, -1.0f },
+	{ 48.5f, -1.0f },
+	{ 49.0f, -1.0f },
+	{ 49.5f, -1.0f },
+	{ 50.0f, -1.0f },
+	{ 50.5f, -1.0f },
+	{ 51.0f, -1.0f },
+	{ 51.5f, -1.0f },
+	{ 52.0f, -1.0f }
 
-};			// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
 
+};
 
 //Values added for our version
 const float toRads = 0.017453293f;
 const float toDegs = 57.29577951f;
 
-float invSpeedSquareds[55] __attribute__((aligned(64))) =
+float invSpeedSquareds[55]  __attribute__((aligned(64))) =
 {
 	0.0399999991f,
 	0.0330578499f,
@@ -352,81 +352,73 @@ int main(void)
 
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
-
-	//float nextSpeed;
-	float nextAngle(minAngle);	// Start with shallowest angle...
-
-	//const float negativeGravXSquared = -g * x * x;
-
-	//const float eqInv2CosAngleSquared = 0.55279f;
-
+	float nextAngle(minAngle);
 	float gXSqrOverCosAngleSqr = -g * x * x * 0.55279f;
 
 	const float cosInc = 0.00373f * -g * x * x;
-	 
-	//Last part of equation
+
 	float eqXTanAngle = 0.32492f * x;
 	const float tanInc = 0.009955f * x;
 
 	//float successHeight = crossBarHeight + margin;
 
-
-	do				// Think de Morgan's Theory, perhaps.
+	do
 	{
 		int speedIndex(0);
 		float nextSpeed(minSpeed);
 		do
 		{
 
-			float height = (gXSqrOverCosAngleSqr * invSpeedSquareds[speedIndex]) + eqXTanAngle;	//Phew!
+			float height = (gXSqrOverCosAngleSqr * invSpeedSquareds[speedIndex]) + eqXTanAngle;
 			
 																																																									#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
 																																																												cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
 																																																									#endif //_longTrace
 
-			if (height <= crossBarHeight + margin)// FAIL!
+			if (height <= successHeight)
 			{
 				nextSpeed += deltaD;
 				speedIndex++;
 			}
-			else						// Otherwise SUCCESS!
+			else
 			{
-				*speed = nextSpeed;		// Record the working combination...
+				*speed = nextSpeed;	
 				*angle = nextAngle;
-				return true;			// ... and stop looking.
+				return true;
 			}
 
 		} while (!(nextSpeed > maxSpeed));
 
-		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
+		nextAngle += deltaD;	
 		eqXTanAngle += tanInc;
 		gXSqrOverCosAngleSqr += cosInc;
 
 	} while (!(nextAngle > maxAngle));
-
 	return false;
 }
 
 // With metrics found, calculate the flight path coords. Uses 'flightPath[104][2]' array as global.
 void generateFlightPath(float speed, float angle)
 {
-	//  ...reminders...
-	//const float deltaD (0.5F)
-	//const int maxDataPoints = 104
-	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
-
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
 
-	const int speedIndex = (speed - 5) * 2;
-	const int angleIndex = (angle - 18) * 2;
+	int speedIndex = (speed - 5) * 2;
 
-	//////////////////////////
-	const float gOverCosAngleSqr = -g * (0.55279f + (0.00373f * angleIndex));
+	const float AngleRads = (angle * toRads);	// Need radians for cos and tan functions 
+	const float cosAngleRads = cos(AngleRads);
+	const float cosAngleRadsSquare = cosAngleRads * cosAngleRads;
 
-	float invSpeedSquare = invSpeedSquareds[speedIndex];
-	float invAllG = gOverCosAngleSqr * invSpeedSquare;
-	float tanAngleRads = 0.32492f + (0.009955f * angleIndex);
+	const float twoCosAngleRadsSquare = 2 * cosAngleRads;
+	const float invTwoCosAngleRadsSquare = 1 / twoCosAngleRadsSquare;
+	const float invTwoCosAngleRadsSquareSpeedSquare = invTwoCosAngleRadsSquare * invSpeedSquareds[speedIndex];
+	const float invAllG = -g * invTwoCosAngleRadsSquareSpeedSquare;
+
+	//const float speedSquared = speed * speed;
+	//const float twoTimesCosAndSpeed = 2.0f * cosAngleRadsSquare * speedSquared;
+	//const float invAllG = -g / twoTimesCosAndSpeed;
+
+	const float tanAngleRads = tan(AngleRads);
 
 	int i(0);
 	do
@@ -435,12 +427,12 @@ void generateFlightPath(float speed, float angle)
 		xValue += deltaD;
 
 		i++;
-		yValue = (xValue* xValue * invAllG) + (xValue * tanAngleRads);
+		yValue = ((xValue * xValue) * invAllG) + (xValue * tanAngleRads);
+	} 
+	while (i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight));
 
-	} while (i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight));
-
-	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
 	flightPath[i][x] = dataEnd;
+
 }
 
 //************************************ Supporting functions *******************************************************
