@@ -409,30 +409,36 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 
 	asm volatile (
 		//initial loading
-		"		lfs		2, %[nextAngle]							\n" //Store starting angle value into (fr2)
-		"		lfs		3, %[distance]							\n" //Store distance value into (fr3)
 		"		lfs		4, %[grav]								\n" //Store -g into (fr4)
+		"		lfs		3, %[distance]							\n" //Store distance value into (fr3)
+		"		lfs		2, %[nextAngle]							\n" //Store starting angle value into (fr2)
 		"		fmuls	4, 4, 3									\n" //-g * distance
-		"		fmuls	4, 4, 3									\n" //-g * distance * distance
-		"		lfs		5, %[cosAng]							\n" //Store initial cos of angle * maths into (fr5)
-		"		fmuls	5, 5, 4									\n" //-g * distance * distance / 2 * cos(Angle) * cos(Angle)
-		"		lfs		6, %[cosIncrement]						\n" //Store cos angle increment into (fr6)
-		"		fmuls	6, 6, 4									\n" //cosIncrement * -g * distance * distance
 		"		lfs		7, %[tanAng]							\n" //Store initial tan of angle into (fr7)
-		"		fmuls	7, 7, 3									\n" //tanAng * distance
-		"		lfs		8, %[tanIncrement]						\n" //Store tan angle increment into (fr8)
-		"		fmuls	8, 8, 3									\n" //tanIncrement * distance
-		"		lfs		9, %[successHeight]						\n" //Store success height into (fr9)
-		"		lfs		10, %[minimumSpeed]						\n" //Store minimum speed into (fr10)
+		
+		"		lfs		5, %[cosAng]							\n" //Store initial cos of angle * maths into (fr5)
+		"		fmuls	4, 4, 3									\n" //-g * distance * distance
 		"		lfs		12, %[deltaDLocal]						\n" //Store deltaD into (fr12)
+		"		lfs		6, %[cosIncrement]						\n" //Store cos angle increment into (fr6)
 		"		lfs		14, %[maximumSpeed]						\n" //Store maximum speed into (fr14)
+		"		fmuls	5, 5, 4									\n" //-g * distance * distance / 2 * cos(Angle) * cos(Angle)
+		
+		"		fmuls	6, 6, 4									\n" //cosIncrement * -g * distance * distance
+		"		lfs		8, %[tanIncrement]						\n" //Store tan angle increment into (fr8)
+		"		fmuls	7, 7, 3									\n" //tanAng * distance
+		"		lfs		9, %[successHeight]						\n" //Store success height into (fr9)
+		"		fmuls	8, 8, 3									\n" //tanIncrement * distance
 		"		lfs		15, %[maximumAngle]						\n" //Store maximun angle into (fr15)
+		"		lfs		10, %[minimumSpeed]						\n" //Store minimum speed into (fr10)
+		
+	
+	
+		
 
 		"		doWhile1:										\n" //First do while loop	
 
-		"			xor		3, 3, 3								\n" //Initialise to zero
-		"			fmr		13, 10								\n" //Copy speed into (fr13)		
+		
 		"			la		4, %[invSpeed]						\n" //Store address of inverse speed squared array at [0] into (r4)
+		"			fmr		13, 10								\n" //Copy speed into (fr13)		
 		"			subi	4, 4, 0x04							\n" //Place pointer to array in proper place
 
 		"			doWhile2:									\n" //Second do while loop
@@ -456,17 +462,14 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		"			fcmpu	3, 2, 15							\n" //nextAngle > maximumAngle - set CR flags
 		"			bc		4, 13, doWhile1						\n" //if angle isnt greater, repeat loop
 
-		"		xor		5, 5, 5									\n" //Clear register to enter return value - set to false
-		"		la		3, 0x00(5)								\n" //Return address of return value
+		"		xor		6, 6, 6									\n" //Return value = false
 		"		b		end										\n" //branch to end
 
 		//if returns true
-		"		success:										\n"
+		"		success:										\n"	
 		"			stfs	2, %[retAngle]						\n" //Store calculated angle in retAngle
 		"			stfs	13, %[retSpeed]						\n" //Store calculatd speed in retSpeed
-		"			xor		5, 5, 5								\n" //Clear register to enter return value
-		"			addi	5, 5, 0x01							\n" //Return value = true
-		"			la		3, 0x00(5)							\n" //Return address of return value
+		"			li		6, 0x01								\n" //Return value = true
 		"		end:											\n"	//fin
 
 
@@ -486,7 +489,7 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		[deltaDLocal] "m" (deltaDLocal),
 		[maximumSpeed] "m" (maximumSpeed),
 		[maximumAngle] "m" (maximumAngle)
-		: "fr2", "fr3", "fr4", "fr5", "fr6", "fr7", "fr12", "fr9", "fr10", "fr11", "fr12", "fr14", "fr15", "r4", "r5", "r1"
+		: "fr2", "fr3", "fr4", "fr5", "fr6", "fr7", "fr12", "fr9", "fr10", "fr11", "fr12", "fr14", "fr15", "r4", "r5", "r6", "r1"
 
 		);
 }
@@ -566,7 +569,7 @@ void generateFlightPath(float speed, float angle)
 		"	fmuls	3, 3, 12						\n" //(xValue * ((xValue * invAllG) + (tanAngleRads))) stored in yValue (fr3)
 
 		//While loop Continuation conditions
-		"	cmp		0, 9, 10						\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r2) store flags in CR0
+		"	cmp		0, 9, 10						\n" //Set flags for comparing maxDataPointsLocal(r9) to i(r10) store flags in CR0
 		"	fcmpu	1, 3, 2							\n" //Compare yValue(fr3) to zero(fr2) store flags in CR1 
 		"	fcmpu	2, 10, 3						\n" //Compare yValue(fr3) to maxHeightLocal(fr10) store flags in CR2
 		"	crand	14, 1, 5						\n" //Compare greater than flags of CR0 and CR1, store resulting bit in crb14(CR3)
