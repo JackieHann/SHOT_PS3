@@ -286,7 +286,7 @@ int main(void)
 	bool foundCombo(false);
 
 	//getDistanceToKick(&distanceToGoal);	// comment this out if required
-	distanceToGoal =9.0F;  //***SHOT use this rather than entering it each run!
+	distanceToGoal =12.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
